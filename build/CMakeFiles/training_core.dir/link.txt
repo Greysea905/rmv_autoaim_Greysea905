@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtraining_core.a CMakeFiles/training_core.dir/src/AppSupport.cpp.o CMakeFiles/training_core.dir/src/AutoAimTypes.cpp.o CMakeFiles/training_core.dir/student/src/StudentTasks.cpp.o
+/usr/bin/ranlib libtraining_core.a
