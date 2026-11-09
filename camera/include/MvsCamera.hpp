@@ -9,6 +9,8 @@
 
 #include "MvCameraControl.h"
 
+#include <opencv2/core.hpp>
+
 namespace rmv::camera
 {
 
@@ -19,7 +21,7 @@ struct Frame
   uint32_t height = 0;       // 图像高（像素）
   uint64_t pixel_type = 0;   // SDK 像素格式枚举值（MvGvspPixelType）
   uint32_t frame_num = 0;    // 帧号
-  std::vector<unsigned char> data;  // 图像字节数据
+  cv::Mat data;  // 图像数据（cv::Mat 64 字节对齐，供上层零拷贝 + AVX2 安全）
 };
 
 

@@ -200,7 +200,8 @@ bool MvsCamera::grab(Frame & frame)
   // 只要不是 BGR8（3 通道），就统一用 SDK 转成 BGR8。相机默认可能是 YUV422/Bayer 等，
   // 直接用原数据会跟上层 CV_8UC3 的 3 通道假设不匹配导致越界崩。
   if (frame.pixel_type != static_cast<uint64_t>(PixelType_Gvsp_BGR8_Packed)) {
-    std::vector<unsigned char> bgr(static_cast<size_t>(frame.width) * frame.height * 3);
+    // 直接写进 frame.data（cv::Mat，64 字节对齐），省掉中间的 std::vector 再拷贝。
+    frame.data = cv::Mat(static_cast<int>(frame.height), static_cast<int>(frame.width), CV_8UC3);
     MV_CC_PIXEL_CONVERT_PARAM_EX param;
     std::memset(&param, 0, sizeof(param));
     param.nWidth = frame.width;
@@ -209,8 +210,8 @@ bool MvsCamera::grab(Frame & frame)
     param.pSrcData = stFrame.pBufAddr;
     param.nSrcDataLen = stFrame.stFrameInfo.nFrameLen;
     param.enDstPixelType = PixelType_Gvsp_BGR8_Packed;
-    param.pDstBuffer = bgr.data();
-    param.nDstBufferSize = static_cast<unsigned int>(bgr.size());
+    param.pDstBuffer = frame.data.data;
+    param.nDstBufferSize = static_cast<unsigned int>(frame.width * frame.height * 3);
 
     nRet = MV_CC_ConvertPixelTypeEx(handle_, &param);
     if (nRet != MV_OK) {
@@ -219,11 +220,9 @@ bool MvsCamera::grab(Frame & frame)
       return false;
     }
     frame.pixel_type = static_cast<uint64_t>(PixelType_Gvsp_BGR8_Packed);
-    frame.data = std::move(bgr);
   } else {
-    frame.data.assign(
-      stFrame.pBufAddr,
-      stFrame.pBufAddr + stFrame.stFrameInfo.nFrameLen);
+    frame.data = cv::Mat(static_cast<int>(frame.height), static_cast<int>(frame.width), CV_8UC3);
+    std::memcpy(frame.data.data, stFrame.pBufAddr, stFrame.stFrameInfo.nFrameLen);
   }
 
   MV_CC_FreeImageBuffer(handle_, &stFrame);

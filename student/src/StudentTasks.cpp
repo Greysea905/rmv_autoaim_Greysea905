@@ -167,9 +167,8 @@ bool get_pic(cv::Mat& pic) {
         return false;
     }
 
-    // 相机缓冲是 std::vector<unsigned char>，只有 16 字节对齐；OpenCV 4.10 的 resize
-    // 用 AVX2 内核需要 32 字节对齐，零拷贝会段错误。clone 一份到 64 字节对齐的 Mat。
-    pic = cv::Mat(frame.height, frame.width, CV_8UC3, frame.data.data()).clone();
+    // frame.data 已是 cv::Mat（64 字节对齐），零拷贝共享，无需 clone（AVX2 安全）。
+    pic = frame.data;
     cv::flip(pic, pic, -1);  // 机上相机倒装，画面旋转 180°
     return true;
 }
