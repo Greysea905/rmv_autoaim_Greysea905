@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdetect.a CMakeFiles/detect.dir/src/Detector.cpp.o CMakeFiles/detect.dir/src/LightBarExtractor.cpp.o CMakeFiles/detect.dir/src/ArmorClassifier.cpp.o
-/usr/bin/ranlib libdetect.a

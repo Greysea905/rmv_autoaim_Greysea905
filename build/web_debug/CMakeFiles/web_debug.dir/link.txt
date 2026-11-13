@@ -1,2 +1,0 @@
-/usr/bin/ar qc libweb_debug.a CMakeFiles/web_debug.dir/src/WebLogger.cpp.o
-/usr/bin/ranlib libweb_debug.a
